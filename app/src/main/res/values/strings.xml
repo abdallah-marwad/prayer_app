@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">prayer app</string>
+    <string name="prayer_app">Prayer App</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="demo_location_txt_prayert">mansora,egypt,mahmoudy st</string>
+    <string name="demo_date_txt_prayert">DEC 25 2024</string>
+    <string name="prayerFreg_demo_next_prayer">Next \n Prayer</string>
+    <string name="prayerFreg_demo_time_left_n_1_hr_16_min">time left \n 1 hr 16 min</string>
+    <string name="prayerFrag_demo_isha">ISHA</string>
+    <string name="show_qbla_direction_on_map">Show Qbla Direction On Map</string>
+</resources>
