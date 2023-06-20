@@ -1,4 +1,4 @@
-package com.abdallah.prayerapp.data.networking
+package com.abdallah.prayerapp.data.source.networking
 
 import com.abdallah.prayerapp.utils.Constants.Companion.BASE_URL
 import okhttp3.OkHttpClient
@@ -9,7 +9,8 @@ class PrayerRetrofit {
 
     companion object {
         private  var retrofit: Retrofit? = null
-        fun getInstance(): Retrofit {
+        private  var prayerApi: PrayerApi? = null
+        private fun getConnection(): Retrofit {
             if (retrofit == null) {
                 Retrofit.Builder()
                     .baseUrl(BASE_URL)
@@ -19,9 +20,12 @@ class PrayerRetrofit {
             return retrofit!!
         }
 
-//        val api by lazy {
-//            retrofit.create(NewsApi::class.java)
-//        }
+        fun getInstance(): PrayerApi {
+            if (prayerApi == null){
+                getConnection().create(PrayerApi::class.java)
+            }
+            return prayerApi!!
+        }
 
     }
 }
