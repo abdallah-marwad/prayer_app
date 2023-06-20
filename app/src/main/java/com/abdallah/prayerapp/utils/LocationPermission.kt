@@ -8,11 +8,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.abdallah.prayerapp.ui.activity.MainActivity
+import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
 import com.abdallah.prayertimequran.common.BuildDialog
 import com.abdallah.prayertimequran.common.BuildToast
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationToken
@@ -25,6 +28,10 @@ class LocationPermission {
     val job: Job = Job()
     val coroutineScope = CoroutineScope(Dispatchers.IO + job)
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    companion object{
+        val locationLiveData: MutableLiveData<Map<String , Float>> = MutableLiveData()
+    }
+
 
     fun takeLocationPermission(activity: Activity) {
 
@@ -82,17 +89,23 @@ class LocationPermission {
 
     @SuppressLint("MissingPermission")
     fun detectLocation(context: Activity) {
-        val sharedInstance = PreferenceManager.getDefaultSharedPreferences(context.application)!!
+        val sharedInstance = SharedPreferencesApp.getInstance(context.application)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
         fusedLocationProviderClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
-                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-                    CancellationTokenSource().token
-
-
-                override fun isCancellationRequested() = false
-            })
+                override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+                    Log.d("test", "onCanceledRequested")
+                    return CancellationTokenSource().token
+                }
+                override fun isCancellationRequested() : Boolean {
+                    Log.d("test", "isCancellationRequested")
+                    return false
+                }
+            }
+        ).addOnFailureListener {
+            Log.d("test", it.message!!)
+        }
             .addOnSuccessListener { location: Location? ->
                 if (location == null) {
                     BuildToast.showToast(
@@ -104,16 +117,24 @@ class LocationPermission {
                     Log.d("test", "Location is null LocationPermission.Class")
 
                 } else {
+
                     coroutineScope.launch {
-//                        sharedInstance.writeInShared(Constants.LONG, "31.5884")
+                        sharedInstance.writeInShared(Constants.LONGITUDE, location.longitude.toFloat())
+                        sharedInstance.writeInShared(Constants.LATITUDE, location.latitude.toFloat())
+                        locationLiveData.postValue(
+                            mapOf(
+                                Constants.LONGITUDE to location.longitude.toFloat(),
+                                Constants.LATITUDE to location.latitude.toFloat()
+                                )
+                        )
+                        Log.d("test" , "Location Taken Successfully long: ${location.longitude}")
+
                         withContext(Dispatchers.Main) {
                             BuildToast.showToast(
                                 context,
-                                " تم تحديد المكان بنجاح قم بسحب شاشه الصلاة لأسفل للتحديث",
+                                "Location Taken Successfully",
                                 FancyToast.SUCCESS
                             )
-
-
                         }
 
                     }

@@ -9,10 +9,10 @@ import retrofit2.http.Query
 class PrayerFragmentRepository(app: MyApplication) {
 
     fun getPrayers(
-        latitude: Double?,
-        longitude: Double?,
+        latitude: Float?,
+        longitude: Float?,
         month: Int,
         year: Int
     ): Call<PrayerNetworkModel?>? =
-        PrayerRetrofit.getInstance().getPrayerTimes(latitude,longitude,month,year)
+        PrayerRetrofit.getInstance().getPrayerTimes(month,year,latitude!!.toDouble(),longitude!!.toDouble())
 }
