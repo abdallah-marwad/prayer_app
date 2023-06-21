@@ -1,4 +1,4 @@
-package com.abdallah.prayertimequran.common
+package com.abdallah.prayerapp.utils.common
 
 import android.app.Activity
 import androidx.appcompat.app.AlertDialog

@@ -3,15 +3,13 @@ package com.abdallah.prayerapp.utils.location
 import android.content.Context
 import android.location.Geocoder
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
-import com.abdallah.prayertimequran.common.BuildToast
+import com.abdallah.prayerapp.utils.common.BuildToast
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class LocationCityDetector {
@@ -24,12 +22,21 @@ class LocationCityDetector {
     ) {
             try {
                 val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(31.11, 30.11, 1)
+                val addresses = geocoder.getFromLocation(myLat, myLong, 1)
                 if (addresses!!.isNotEmpty()) {
-                    val governorateName = addresses[0].adminArea
+                    var governorateName = addresses[0].adminArea
+                    val areaName = addresses[0].subAdminArea
                     val countryName = addresses[0].countryName
-                    val streetName = addresses[0].thoroughfare
-                    val address = " $governorateName,$countryName,$streetName st"
+                    var streetName = addresses[0].thoroughfare
+                    if(governorateName == null){
+                        governorateName = areaName
+                    }
+                    if(streetName == null){
+                        streetName =""
+                    }else{
+                        streetName+=" st"
+                    }
+                    val address = " $governorateName,$countryName,$streetName"
                     Log.d("test", "location is : $address")
                     LocationPermission.locationAddressLiveData.postValue(address)
                     sharedPreferencesApp.writeInShared(Constants.LOCATION, " $address")

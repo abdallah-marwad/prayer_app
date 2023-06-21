@@ -85,4 +85,6 @@ dependencies {
     implementation 'io.github.shashank02051997:FancyToast:2.0.2'
     //shared Preference
     implementation "androidx.preference:preference-ktx:1.2.0"
+    // swipe refresh layout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 }

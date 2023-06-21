@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "prayer_times")
 data class PrayerTimesRoom (
     @PrimaryKey(autoGenerate = true)
-    var id : Int? =0,
+    var id : Int? =null,
     val longDate : Long?,
     val StringDate : String?,
+    val readableDate : String?,
     val fajr : String?,
     val sunrise : String?,
     val duhr : String?,

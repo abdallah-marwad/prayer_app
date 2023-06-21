@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import com.abdallah.prayerapp.databinding.ActivityMainBinding
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.location.LocationPermission
@@ -14,6 +15,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        Log.d("test" , "main activity created")
 
     }
 
@@ -27,11 +30,8 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty()
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
             ) {
-                val locationPermission = LocationPermission()
-
-                //Location Permission taken
+                LocationPermission().detectLocation(this)
                 Log.d("test", "location permission applied")
-                locationPermission.detectLocation(this)
 
             }
         }

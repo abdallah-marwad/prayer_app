@@ -19,7 +19,7 @@ interface PrayerDao {
     @Query("SELECT * From prayer_times Where id = :id")
     fun selectItemTime(id : Int) : LiveData<PrayerTimesRoom>
 
-    @Query("SELECT * From prayer_times Where longDate = :date")
-    fun selectItemTime(date : Long) : LiveData<PrayerTimesRoom>
+    @Query("SELECT * From prayer_times Where StringDate = :stringDate")
+    fun selectItemTime(stringDate : String) : LiveData<PrayerTimesRoom>
 
 }

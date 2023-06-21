@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.abdallah.prayerapp.data.model.PrayerTimesRoom
 
 
-@Database(entities = [PrayerTimesRoom::class ], version = 1)
+@Database(entities = [PrayerTimesRoom::class ], version = 2)
 abstract class RoomDB : RoomDatabase() {
     abstract fun prayersDao(): PrayerDao?
 
@@ -25,7 +25,7 @@ abstract class RoomDB : RoomDatabase() {
                                 context.applicationContext,
                                 RoomDB::class.java,
                                 "prayer.db"
-                            ).build()
+                            ).fallbackToDestructiveMigration().build()
                         } catch (e: Exception) {
                             return null
                         }

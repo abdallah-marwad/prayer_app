@@ -10,8 +10,8 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
-import com.abdallah.prayertimequran.common.BuildDialog
-import com.abdallah.prayertimequran.common.BuildToast
+import com.abdallah.prayerapp.utils.common.BuildDialog
+import com.abdallah.prayerapp.utils.common.BuildToast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -90,65 +90,86 @@ class LocationPermission {
     fun detectLocation(context: Activity) {
         val sharedInstance = SharedPreferencesApp.getInstance(context.application)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-        fusedLocationProviderClient.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            object : CancellationToken() {
-                override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
-                    Log.d("test", "onCanceledRequested")
-                    return CancellationTokenSource().token
-                }
-
-                override fun isCancellationRequested(): Boolean {
-                    Log.d("test", "isCancellationRequested")
-                    return false
-                }
-            }
-        ).addOnFailureListener {
+        fusedLocationProviderClient.lastLocation.addOnFailureListener {
             Log.d("test", it.message!!)
         }
             .addOnSuccessListener { location: Location? ->
                 if (location == null) {
                     BuildToast.showToast(
                         context,
-                        "Please make sure that the location service is activated",
+                        "Please open Gps and retry",
                         FancyToast.ERROR
                     )
-
                     Log.d("test", "Location is null LocationPermission.Class")
 
                 } else {
-                    val longitude = location.longitude.toFloat()
-                    val latitude = location.longitude.toFloat()
-                    var locationCityDetector = LocationCityDetector()
-                    coroutineScope.launch {
-                        sharedInstance.writeInShared(Constants.LONGITUDE, longitude)
-                        sharedInstance.writeInShared(Constants.LATITUDE, latitude)
-                        locationCityDetector.setAddress(
-                            latitude.toDouble(), longitude.toDouble(),coroutineScope,
-                            sharedInstance, context
-                        )
-                        locationLiveData.postValue(
-                            mapOf(
-                                Constants.LONGITUDE to longitude,
-                                Constants.LATITUDE to latitude
-                            )
-                        )
-                        Log.d("test", "Location Taken Successfully long: ${location.longitude}")
-                        withContext(Dispatchers.Main) {
-                            BuildToast.showToast(
-                                context,
-                                "Location Taken Successfully",
-                                FancyToast.SUCCESS
-                            )
-                        }
-
-                    }
+                    locationIsNotNull(location, sharedInstance, context)
                 }
             }
-
     }
 
+//    @SuppressLint("MissingPermission")
+//    private fun getCurrentLocationIfLastLocationIsNull(context: Activity , sharedInstance: SharedPreferencesApp){
+//        fusedLocationProviderClient.getCurrentLocation(
+//            Priority.PRIORITY_HIGH_ACCURACY,
+//            object : CancellationToken() {
+//                override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+//                    Log.d("test", "onCanceledRequested")
+//                    return CancellationTokenSource().token
+//                }
+//
+//                override fun isCancellationRequested(): Boolean {
+//                    Log.d("test", "isCancellationRequested")
+//                    return false
+//                }
+//            }
+//        ).addOnFailureListener {
+//            Log.d("test", it.message!!)
+//        }
+//            .addOnSuccessListener { location: Location? ->
+//                if (location == null) {
+//                    BuildToast.showToast(
+//                        context,
+//                        "Please make sure that the location service is activated",
+//                        FancyToast.ERROR
+//                    )
+//
+//                    Log.d("test", "Location is null LocationPermission.Class")
+//
+//                } else {
+//                    locationIsNotNull(location , sharedInstance , context)
+//                }
+//            }
+//    }
 
+private fun locationIsNotNull(location: Location , sharedInstance: SharedPreferencesApp , context: Activity){
+    val longitude = location.longitude.toFloat()
+    val latitude = location.longitude.toFloat()
+    var locationCityDetector = LocationCityDetector()
+    coroutineScope.launch {
+        sharedInstance.writeInShared(Constants.LONGITUDE, longitude)
+        sharedInstance.writeInShared(Constants.LATITUDE, latitude)
+        locationCityDetector.setAddress(
+            latitude.toDouble(), longitude.toDouble(),coroutineScope,
+            sharedInstance, context
+        )
+        locationLiveData.postValue(
+            mapOf(
+                Constants.LONGITUDE to longitude,
+                Constants.LATITUDE to latitude
+            )
+        )
+        Log.d("test", "Location Taken Successfully long: ${location.longitude}")
+        withContext(Dispatchers.Main) {
+            BuildToast.showToast(
+                context,
+                "Location Taken Successfully",
+                FancyToast.SUCCESS
+            )
+        }
+
+    }
+}
 }
 
 
