@@ -6,16 +6,18 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.abdallah.prayerapp.data.model.PrayerNetworkModel
 import com.abdallah.prayerapp.data.model.Timings
 import com.abdallah.prayerapp.data.repository.PrayerFragmentRepository
-import com.abdallah.prayerapp.ui.activity.MainActivity
 import com.abdallah.prayerapp.utils.Constants
-import com.abdallah.prayerapp.utils.LocationPermission
-import com.abdallah.prayerapp.utils.common.MyApplication
+import com.abdallah.prayerapp.utils.location.LocationPermission
 import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
 import com.abdallah.prayertimequran.common.BuildToast
 import com.shashank.sony.fancytoastlib.FancyToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,16 +29,26 @@ class PrayerFragmentViewModel(app : Application) : AndroidViewModel(app) {
     private var longitude : Float? = null
     private var latitude : Float? = null
     val responseLiveData: MutableLiveData<Timings> = MutableLiveData()
+    private val longAndLatStateFlow: MutableStateFlow<Boolean> =
+        MutableStateFlow(false)
 
 
     fun getLocation( activity: Activity ,owner: LifecycleOwner){
         if (isSharedContainLocation()){
             Log.d("test" , "Location in shared")
             getLocationDataFromShared()
-            getPrayer(latitude!!, longitude!!)
+            viewModelScope.launch (Dispatchers.Main){
+                longAndLatStateFlow.collect{
+                    getPrayer(latitude!!, longitude!!)
+                }
+
+            }
+
+
         }else{
             Log.d("test" , "Location not in shared")
             LocationPermission().takeLocationPermission(activity)
+
 
         LocationPermission.locationLiveData.observe(owner) { map ->
             Log.d("test", "Location not in shared")
@@ -49,8 +61,12 @@ class PrayerFragmentViewModel(app : Application) : AndroidViewModel(app) {
     }
 
     private fun getLocationDataFromShared(){
-        longitude = sharedPreferencesApp.getFloatFromShared(Constants.LONGITUDE , 0f)
-        latitude = sharedPreferencesApp.getFloatFromShared(Constants.LATITUDE , 0f)
+        viewModelScope.launch (Dispatchers.IO){
+            longitude = sharedPreferencesApp.getFloatFromShared(Constants.LONGITUDE , 0f)
+            latitude = sharedPreferencesApp.getFloatFromShared(Constants.LATITUDE , 0f)
+            longAndLatStateFlow.emit(true)
+        }
+
     }
     private fun getPrayer(latitude : Float, longitude : Float){
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
@@ -70,7 +86,10 @@ class PrayerFragmentViewModel(app : Application) : AndroidViewModel(app) {
                     Log.d("Test" ,"Success Respnse with Fajr in : "+ response.body()!!.data[5].timings.Fajr)
                     responseLiveData.postValue(response.body()!!.data[5].timings)
                 }else {
-                    Log.d("Test", response.errorBody().toString()+ call.toString())
+                    if(response.code() == 500){
+                        BuildToast.showToast(getApplication(),"Error in the server with code : 500 ,try again" ,FancyToast.ERROR)
+                    }
+                    Log.d("Test", response.code().toString() + response.errorBody())
                 }
             }
             override fun onFailure(call: Call<PrayerNetworkModel?>, t: Throwable) {

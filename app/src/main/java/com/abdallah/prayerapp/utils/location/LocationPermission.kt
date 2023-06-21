@@ -1,21 +1,18 @@
-package com.abdallah.prayerapp.utils
+package com.abdallah.prayerapp.utils.location
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
-import com.abdallah.prayerapp.ui.activity.MainActivity
+import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
 import com.abdallah.prayertimequran.common.BuildDialog
 import com.abdallah.prayertimequran.common.BuildToast
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationToken
@@ -28,13 +25,15 @@ class LocationPermission {
     val job: Job = Job()
     val coroutineScope = CoroutineScope(Dispatchers.IO + job)
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    companion object{
-        val locationLiveData: MutableLiveData<Map<String , Float>> = MutableLiveData()
+
+    companion object {
+        val locationLiveData: MutableLiveData<Map<String, Float>> = MutableLiveData()
+        val locationAddressLiveData: MutableLiveData<String> = MutableLiveData()
+        val progressbarStateLiveData: MutableLiveData<Boolean> = MutableLiveData()
     }
 
 
     fun takeLocationPermission(activity: Activity) {
-
         if (ActivityCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -98,7 +97,8 @@ class LocationPermission {
                     Log.d("test", "onCanceledRequested")
                     return CancellationTokenSource().token
                 }
-                override fun isCancellationRequested() : Boolean {
+
+                override fun isCancellationRequested(): Boolean {
                     Log.d("test", "isCancellationRequested")
                     return false
                 }
@@ -117,18 +117,23 @@ class LocationPermission {
                     Log.d("test", "Location is null LocationPermission.Class")
 
                 } else {
-
+                    val longitude = location.longitude.toFloat()
+                    val latitude = location.longitude.toFloat()
+                    var locationCityDetector = LocationCityDetector()
                     coroutineScope.launch {
-                        sharedInstance.writeInShared(Constants.LONGITUDE, location.longitude.toFloat())
-                        sharedInstance.writeInShared(Constants.LATITUDE, location.latitude.toFloat())
+                        sharedInstance.writeInShared(Constants.LONGITUDE, longitude)
+                        sharedInstance.writeInShared(Constants.LATITUDE, latitude)
+                        locationCityDetector.setAddress(
+                            latitude.toDouble(), longitude.toDouble(),coroutineScope,
+                            sharedInstance, context
+                        )
                         locationLiveData.postValue(
                             mapOf(
-                                Constants.LONGITUDE to location.longitude.toFloat(),
-                                Constants.LATITUDE to location.latitude.toFloat()
-                                )
+                                Constants.LONGITUDE to longitude,
+                                Constants.LATITUDE to latitude
+                            )
                         )
-                        Log.d("test" , "Location Taken Successfully long: ${location.longitude}")
-
+                        Log.d("test", "Location Taken Successfully long: ${location.longitude}")
                         withContext(Dispatchers.Main) {
                             BuildToast.showToast(
                                 context,

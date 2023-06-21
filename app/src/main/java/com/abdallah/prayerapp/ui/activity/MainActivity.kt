@@ -4,11 +4,9 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.viewbinding.ViewBinding
-import com.abdallah.prayerapp.R
 import com.abdallah.prayerapp.databinding.ActivityMainBinding
 import com.abdallah.prayerapp.utils.Constants
-import com.abdallah.prayerapp.utils.LocationPermission
+import com.abdallah.prayerapp.utils.location.LocationPermission
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

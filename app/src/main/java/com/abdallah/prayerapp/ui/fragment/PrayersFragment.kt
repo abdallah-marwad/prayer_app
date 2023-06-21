@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.abdallah.prayerapp.R
 import com.abdallah.prayerapp.databinding.FragmentPrayersBinding
 import com.abdallah.prayerapp.ui.viewmodel.PrayerFragmentViewModel
+import com.abdallah.prayerapp.utils.location.LocationPermission
 import kotlin.concurrent.timer
 
 
@@ -31,6 +32,8 @@ class PrayersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        addressOnClick()
+        setAddress()
         viewModel.getLocation(requireActivity(),viewLifecycleOwner)
         viewModel.responseLiveData.observe(viewLifecycleOwner){times->
             binding.prayerFragFajrTime.text = times.Fajr
@@ -41,6 +44,17 @@ class PrayersFragment : Fragment() {
             binding.prayerFragIshaTime.text = times.Isha
 
         }
+    }
+    private fun addressOnClick(){
+        binding.prayerFragLocationTxt.setOnClickListener {
+            LocationPermission().takeLocationPermission(requireActivity())
+        }
+    }
+    private fun setAddress(){
+        LocationPermission.locationAddressLiveData.observe(viewLifecycleOwner  ){
+            binding.prayerFragLocationTxt.text =it
+        }
+
     }
 
 }
