@@ -1,4 +1,4 @@
-package com.abdallah.prayerapp.ui.viewmodel
+package com.abdallah.prayerapp.ui.viewmodel.prayer
 
 import android.app.Activity
 import android.app.Application
@@ -9,7 +9,7 @@ import com.abdallah.prayerapp.data.model.PrayerTimesRoom
 import com.abdallah.prayerapp.data.repository.PrayerFragmentRepository
 import com.abdallah.prayerapp.model.ApiObjConverter
 import com.abdallah.prayerapp.ui.fragment.PrayersFragment.Companion.progressVisibilityStateLiveData
-import com.abdallah.prayerapp.utils.CalenderZeroTime
+import com.abdallah.prayerapp.utils.CalenderCustomTime
 import com.abdallah.prayerapp.utils.CheckInternetConnectivity
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.location.LocationPermission
@@ -171,7 +171,7 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
         sharedPreferencesApp.preferences.contains(Constants.LATITUDE)
 
     fun selectItemTimeNotLiveData(time: Long) =
-        repository.selectItemTimeNotLiveData(CalenderZeroTime().getCalenderZeroTime(time))
+        repository.selectItemTimeNotLiveData(CalenderCustomTime().getCalenderWithCustomTime(time))
 
 }
 

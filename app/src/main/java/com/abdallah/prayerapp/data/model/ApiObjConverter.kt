@@ -1,9 +1,8 @@
 package com.abdallah.prayerapp.model
 
-import android.icu.util.Calendar
 import com.abdallah.prayerapp.data.model.Data
 import com.abdallah.prayerapp.data.model.PrayerTimesRoom
-import com.abdallah.prayerapp.utils.CalenderZeroTime
+import com.abdallah.prayerapp.utils.CalenderCustomTime
 import java.util.*
 
 class ApiObjConverter {
@@ -14,7 +13,7 @@ class ApiObjConverter {
 
         return PrayerTimesRoom(
             longDate = longDate,
-            StringDate = CalenderZeroTime().getCalenderZeroTime(longDate),
+            StringDate = CalenderCustomTime().getCalenderWithCustomTime(longDate),
             readableDate = stringDate,
             fajr = itemData.timings.Fajr,
             sunrise = itemData.timings.Sunrise,

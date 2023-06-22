@@ -12,9 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.abdallah.prayerapp.data.model.PrayerTimesRoom
 import com.abdallah.prayerapp.databinding.FragmentPrayersBinding
-import com.abdallah.prayerapp.ui.fragment.PrayersFragment.Companion.progressVisibilityStateLiveData
-import com.abdallah.prayerapp.ui.viewmodel.PrayerFragmentViewModel
+import com.abdallah.prayerapp.ui.viewmodel.prayer.PrayerFragmentViewModel
 import com.abdallah.prayerapp.utils.Constants
+import com.abdallah.prayerapp.utils.DateModifier
 import com.abdallah.prayerapp.utils.common.BuildToast
 import com.abdallah.prayerapp.utils.location.LocationPermission
 import com.shashank.sony.fancytoastlib.FancyToast
@@ -137,16 +137,10 @@ private fun setPrayerTimes(times: PrayerTimesRoom){
     private fun formatTime(timeString: String): String {
         val inputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
         val outputFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
-        val time = inputFormat.parse(getFirstFiveChars(timeString))
+        val time = inputFormat.parse(DateModifier(). getFirstFiveChars(timeString))
         return outputFormat.format(time)
     }
-    private fun getFirstFiveChars(timeString: String) : String{
-        var newTime= ""
-        for (i in 0..4){
-            newTime+= timeString[i].toString()
-        }
-        return newTime
-    }
+
     private fun backArrowBtnOnClick() {
         binding.prayerFragBackArrowDate.setOnClickListener {
 
