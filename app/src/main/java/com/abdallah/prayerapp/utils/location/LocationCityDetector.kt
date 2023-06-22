@@ -21,7 +21,7 @@ class LocationCityDetector {
         context : Context
     ) {
             try {
-                val geocoder = Geocoder(context, Locale.getDefault())
+                val geocoder = Geocoder(context, Locale.ENGLISH)
                 val addresses = geocoder.getFromLocation(myLat, myLong, 1)
                 if (addresses!!.isNotEmpty()) {
                     var governorateName = addresses[0].adminArea

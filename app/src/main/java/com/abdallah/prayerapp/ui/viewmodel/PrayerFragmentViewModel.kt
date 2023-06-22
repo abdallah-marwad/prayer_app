@@ -3,25 +3,21 @@ package com.abdallah.prayerapp.ui.viewmodel
 import android.app.Activity
 import android.app.Application
 import android.util.Log
-import androidx.constraintlayout.motion.widget.Debug.getLocation
 import androidx.lifecycle.*
 import com.abdallah.prayerapp.data.model.PrayerNetworkModel
 import com.abdallah.prayerapp.data.model.PrayerTimesRoom
-import com.abdallah.prayerapp.data.model.Timings
 import com.abdallah.prayerapp.data.repository.PrayerFragmentRepository
 import com.abdallah.prayerapp.model.ApiObjConverter
 import com.abdallah.prayerapp.ui.fragment.PrayersFragment.Companion.progressVisibilityStateLiveData
 import com.abdallah.prayerapp.utils.CalenderZeroTime
+import com.abdallah.prayerapp.utils.CheckInternetConnectivity
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.location.LocationPermission
 import com.abdallah.prayerapp.utils.common.SharedPreferencesApp
 import com.abdallah.prayerapp.utils.common.BuildToast
 import com.shashank.sony.fancytoastlib.FancyToast
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,21 +27,43 @@ import kotlin.collections.ArrayList
 class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     val repository = PrayerFragmentRepository(getApplication())
     var sharedPreferencesApp = SharedPreferencesApp(getApplication())
-    private var longitude: Float? = null
-    private var latitude: Float? = null
-    var prayerTimesLiveData: LiveData<PrayerTimesRoom> = MutableLiveData()
+    var currentItem: Int = 0
+    var isArraysClickable = false
+    var longitude: Float? = null
+    var latitude: Float? = null
+    var prayerTimesLiveData: MutableLiveData<PrayerTimesRoom> = MutableLiveData()
     private val longAndLatStateFlow: MutableStateFlow<Boolean> =
+        MutableStateFlow(false)
+    private val getItemFromRoomStateFlow: MutableStateFlow<Boolean> =
         MutableStateFlow(false)
 
     fun getLocationCall(activity: Activity, owner: LifecycleOwner) {
         if (!sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)) {
             Log.d("Test", "Room dont have data will make api call")
-            getLocation(activity, owner)
+            if (CheckInternetConnectivity().hasInternetConnection(getApplication())) {
+                getLocation(activity, owner)
+            } else {
+                BuildToast.showToast(
+                    getApplication(),
+                    "Please connect to internet then (swipe to refresh).",
+                    FancyToast.WARNING
+                )
+            }
+
         } else {
-            // get data from database
+            // get data from database but if not found the date make new api call
             Log.d("Test", "Room alredy have data and show from it")
-            prayerTimesLiveData =
-                repository.getTimingItem(CalenderZeroTime().getCalenderZeroTime(Date().time))
+            viewModelScope.launch(Dispatchers.IO) {
+
+                val prayerTimes = selectItemTimeNotLiveData(Date().time)
+                if (prayerTimes != null) {
+                    prayerTimesLiveData.postValue(prayerTimes!!)
+                } else {
+                    // Api Chain validation failed when make it
+                    getLocation(activity , owner)
+                }
+            }
+
         }
     }
 
@@ -56,7 +74,11 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             viewModelScope.launch(Dispatchers.Main) {
                 longAndLatStateFlow.collect {
                     progressVisibilityStateLiveData.postValue(true)
-                    getPrayerApi(latitude!!, longitude!!)
+                    getPrayerApi(
+                        latitude!!,
+                        longitude!!,
+                        dayOfMonth = dayOfMonth()
+                    )
                 }
             }
         } else {
@@ -69,7 +91,7 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
                 longitude = map[Constants.LONGITUDE]
                 latitude = map[Constants.LATITUDE]
                 progressVisibilityStateLiveData.postValue(true)
-                getPrayerApi(latitude!!, longitude!!)
+                getPrayerApi(latitude!!, longitude!!, dayOfMonth = dayOfMonth())
             }
         }
     }
@@ -83,7 +105,12 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
 
     }
 
-     fun getPrayerApi(latitude: Float, longitude: Float, nextMonth: Int = 0) {
+    fun getPrayerApi(
+        latitude: Float,
+        longitude: Float,
+        nextMonth: Int = 0,
+        dayOfMonth: Int
+    ) {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1 + nextMonth
         repository.getPrayers(
@@ -111,13 +138,11 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
                         repository.insertTime(prayerTimesRoomList)
                         Log.d("Test", "Data inserted to room")
                         sharedPreferencesApp.writeInShared(Constants.ROOM_CONTAIN_DATA, true)
-
-
-                            prayerTimesLiveData =
-                                repository.getTimingItem(CalenderZeroTime().getCalenderZeroTime(Date().time))
-
-
                         progressVisibilityStateLiveData.postValue(false)
+                        prayerTimesLiveData.postValue(
+                            converter.toPrayerTimesRoom(response.body()!!.data[dayOfMonth - 1]))
+
+
                     }
 
                 } else {
@@ -128,7 +153,7 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
                             "Error in the server with code : 500 ,try again",
                             FancyToast.ERROR
                         )
-                        Log.d("Test", response.code().toString() + response.errorBody())
+                        Log.d("Test", response.code().toString())
                     }
                 }
             }
@@ -141,8 +166,13 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
         })
     }
 
-
+    private fun dayOfMonth() = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
     private fun isSharedContainLocation() =
         sharedPreferencesApp.preferences.contains(Constants.LATITUDE)
 
+    fun selectItemTimeNotLiveData(time: Long) =
+        repository.selectItemTimeNotLiveData(CalenderZeroTime().getCalenderZeroTime(time))
+
 }
+
+

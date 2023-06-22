@@ -33,5 +33,9 @@ class PrayerFragmentRepository(val app: Application) {
         return roomInstance!!.prayersDao()!!.selectItemTime(stringDate)
 
     }
+fun selectItemTimeNotLiveData(stringDate : String): PrayerTimesRoom? {
+        return roomInstance!!.prayersDao()!!.selectItemTimeNotLiveData(stringDate)
+
+    }
 
 }

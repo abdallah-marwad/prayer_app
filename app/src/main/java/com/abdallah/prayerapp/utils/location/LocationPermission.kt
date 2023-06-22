@@ -97,9 +97,10 @@ class LocationPermission {
                 if (location == null) {
                     BuildToast.showToast(
                         context,
-                        "Please open Gps and retry",
+                        "Please open location .",
                         FancyToast.ERROR
                     )
+                    getCurrentLocationIfLastLocationIsNull(context,sharedInstance)
                     Log.d("test", "Location is null LocationPermission.Class")
 
                 } else {
@@ -108,39 +109,39 @@ class LocationPermission {
             }
     }
 
-//    @SuppressLint("MissingPermission")
-//    private fun getCurrentLocationIfLastLocationIsNull(context: Activity , sharedInstance: SharedPreferencesApp){
-//        fusedLocationProviderClient.getCurrentLocation(
-//            Priority.PRIORITY_HIGH_ACCURACY,
-//            object : CancellationToken() {
-//                override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
-//                    Log.d("test", "onCanceledRequested")
-//                    return CancellationTokenSource().token
-//                }
-//
-//                override fun isCancellationRequested(): Boolean {
-//                    Log.d("test", "isCancellationRequested")
-//                    return false
-//                }
-//            }
-//        ).addOnFailureListener {
-//            Log.d("test", it.message!!)
-//        }
-//            .addOnSuccessListener { location: Location? ->
-//                if (location == null) {
-//                    BuildToast.showToast(
-//                        context,
-//                        "Please make sure that the location service is activated",
-//                        FancyToast.ERROR
-//                    )
-//
-//                    Log.d("test", "Location is null LocationPermission.Class")
-//
-//                } else {
-//                    locationIsNotNull(location , sharedInstance , context)
-//                }
-//            }
-//    }
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocationIfLastLocationIsNull(context: Activity , sharedInstance: SharedPreferencesApp){
+        fusedLocationProviderClient.getCurrentLocation(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            object : CancellationToken() {
+                override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+                    Log.d("test", "onCanceledRequested")
+                    return CancellationTokenSource().token
+                }
+
+                override fun isCancellationRequested(): Boolean {
+                    Log.d("test", "isCancellationRequested")
+                    return false
+                }
+            }
+        ).addOnFailureListener {
+            Log.d("test", it.message!!)
+        }
+            .addOnSuccessListener { location: Location? ->
+                if (location == null) {
+                    BuildToast.showToast(
+                        context,
+                        "cannot access location !",
+                        FancyToast.ERROR
+                    )
+
+                    Log.d("test", "Location is null LocationPermission.Class")
+
+                } else {
+                    locationIsNotNull(location , sharedInstance , context)
+                }
+            }
+    }
 
 private fun locationIsNotNull(location: Location , sharedInstance: SharedPreferencesApp , context: Activity){
     val longitude = location.longitude.toFloat()

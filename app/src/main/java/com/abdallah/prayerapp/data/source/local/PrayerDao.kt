@@ -21,5 +21,7 @@ interface PrayerDao {
 
     @Query("SELECT * From prayer_times Where StringDate = :stringDate")
     fun selectItemTime(stringDate : String) : LiveData<PrayerTimesRoom>
+    @Query("SELECT * From prayer_times Where StringDate = :stringDate")
+    fun selectItemTimeNotLiveData(stringDate : String) : PrayerTimesRoom?
 
 }

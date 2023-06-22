@@ -8,5 +8,6 @@ class Constants {
         const val LATITUDE = "latitude"
         const val ROOM_CONTAIN_DATA = "Room Contain Data"
         const val LOCATION = "location"
+        const val DAY_VALUE_IN_MILLI = 86400000L
     }
 }
