@@ -13,4 +13,12 @@ class CalenderCustomTime(){
         calender.set(Calendar.SECOND, 0)
         return Date(calender.timeInMillis).toString()
     }
+    fun getCalenderWithCustomLongTime( hour : Int =0 , minute : Int =0) : Long{
+        val calender = Calendar.getInstance()
+        calender.set(Calendar.HOUR_OF_DAY , hour)
+        calender.set(Calendar.MINUTE, minute)
+        calender.set(Calendar.SECOND, 0)
+        calender.timeZone = android.icu.util.TimeZone.getDefault()
+        return calender.timeInMillis
+    }
 }

@@ -9,4 +9,5 @@
     <string name="prayerFreg_demo_time_left_n_1_hr_16_min">time left \n 1 hr 16 min</string>
     <string name="prayerFrag_demo_isha">ISHA</string>
     <string name="show_qbla_direction_on_map">Show Qbla Direction On Map</string>
+    <string name="google_maps_api_key">AIzaSyCJcO3ri6xPetBhAAC-E2yYggk1oATYbCw</string>
 </resources>

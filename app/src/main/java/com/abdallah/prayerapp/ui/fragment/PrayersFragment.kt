@@ -1,7 +1,9 @@
 package com.abdallah.prayerapp.ui.fragment
 
+import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,9 +12,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
+import androidx.navigation.fragment.findNavController
+import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 import com.abdallah.prayerapp.databinding.FragmentPrayersBinding
 import com.abdallah.prayerapp.ui.viewmodel.prayer.PrayerFragmentViewModel
+import com.abdallah.prayerapp.utils.CalenderCustomTime
 import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.DateModifier
 import com.abdallah.prayerapp.utils.common.BuildToast
@@ -27,10 +31,14 @@ import java.util.*
 class PrayersFragment : Fragment() {
     private lateinit var binding: FragmentPrayersBinding
     private lateinit var viewModel: PrayerFragmentViewModel
+    private lateinit var mapOfPrayers: MutableMap<String, String>
+    var timer: CountDownTimer? = null
 
     companion object {
         val progressVisibilityStateLiveData: MutableLiveData<Boolean> = MutableLiveData()
+        var remainingTime: MutableLiveData<Map<String, Long>> = MutableLiveData()
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +57,7 @@ class PrayersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
+        Log.d("test", "Now is ${Date().time}")
         addressOnClick()
         setAddress()
         updatePrayerTimes()
@@ -56,6 +65,7 @@ class PrayersFragment : Fragment() {
         swipeToRefresh()
         forwardArrowBtnOnClick()
         backArrowBtnOnClick()
+        qiblaBtnOnclick()
     }
 
     private fun swipeToRefresh() {
@@ -65,14 +75,23 @@ class PrayersFragment : Fragment() {
             binding.prayerSwip.isRefreshing = false
         }
     }
+    private fun qiblaBtnOnclick() {
+        binding.prayerFragButton.setOnClickListener {
+            findNavController().navigate(PrayersFragmentDirections.actionPrayersFragmentToQuiblaFragment())
+        }
+    }
 
     private fun updatePrayerTimes() {
         viewModel.prayerTimesLiveData.observe(viewLifecycleOwner) { times ->
             binding.progress.visibility = View.INVISIBLE
             if (times != null) {
-                // starting timer
+                // starting timer but check first if the date equal today
                 viewModel.isArraysClickable = true
                 setPrayerTimes(times)
+                setPrayerMap(times)
+                if (times.StringDate!! == CalenderCustomTime().getCalenderWithCustomTime(Date().time)) {
+//                    viewModel.handleTimer(mapOfPrayers, viewLifecycleOwner)
+                }
             } else {
                 Log.d("test", "get data times is null from room")
             }
@@ -80,20 +99,32 @@ class PrayersFragment : Fragment() {
 
         }
     }
-private fun setPrayerTimes(times: PrayerTimesRoom){
-    binding.prayerFragDateTxt.text = times.readableDate
-    binding.prayerFragFajrTime.text = formatTime(times.fajr!!)
-    binding.prayerFragSunriseTime.text = formatTime(times.sunrise!!)
-    binding.prayerFragDuhrTime.text = formatTime(times.duhr!!)
-    binding.prayerFragAsrTime.text = formatTime(times.asr!!)
-    binding.prayerFragMaghrebTime.text = formatTime(times.magreb!!)
-    binding.prayerFragIshaTime.text = formatTime(times.isha!!)
-}
+
+    private fun setPrayerMap(times: PrayerTimesRoom) {
+        mapOfPrayers = mutableMapOf()
+        mapOfPrayers[Constants.FAJR] = times.fajr!!
+        mapOfPrayers[Constants.SUNRISE] = times.sunrise!!
+        mapOfPrayers[Constants.DUHR] = times.duhr!!
+        mapOfPrayers[Constants.ASR] = times.asr!!
+        mapOfPrayers[Constants.MAGHREB] = times.magreb!!
+        mapOfPrayers[Constants.ISHA] = times.isha!!
+    }
+
+    private fun setPrayerTimes(times: PrayerTimesRoom) {
+        binding.prayerFragDateTxt.text = times.readableDate
+        binding.prayerFragFajrTime.text = formatTime(times.fajr!!)
+        binding.prayerFragSunriseTime.text = formatTime(times.sunrise!!)
+        binding.prayerFragDuhrTime.text = formatTime(times.duhr!!)
+        binding.prayerFragAsrTime.text = formatTime(times.asr!!)
+        binding.prayerFragMaghrebTime.text = formatTime(times.magreb!!)
+        binding.prayerFragIshaTime.text = formatTime(times.isha!!)
+    }
+
     private fun forwardArrowBtnOnClick() {
         binding.prayerFragForwardArrowDate.setOnClickListener {
             if (viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
             ) {
-                if(viewModel.isArraysClickable) {
+                if (viewModel.isArraysClickable) {
                     if (viewModel.currentItem >= 7) {
                         BuildToast.showToast(
                             requireActivity(),
@@ -102,13 +133,13 @@ private fun setPrayerTimes(times: PrayerTimesRoom){
                         )
                         Log.d("test", "Connect get more than 7 days")
                     } else {
-                        var newDay = viewModel.currentItem+1
+                        var newDay = viewModel.currentItem + 1
                         val newDate =
-                            (newDay *Constants.DAY_VALUE_IN_MILLI) + Date().time
+                            (newDay * Constants.DAY_VALUE_IN_MILLI) + Date().time
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             val itemPrayer = viewModel.selectItemTimeNotLiveData(newDate)
                             if (itemPrayer != null) {
-                                withContext(Dispatchers.Main){
+                                withContext(Dispatchers.Main) {
                                     setPrayerTimes(itemPrayer)
                                     viewModel.currentItem++
                                 }
@@ -117,63 +148,70 @@ private fun setPrayerTimes(times: PrayerTimesRoom){
                                 Log.d("test", "make new api call with the next month")
 
                                 // make new api call with the next month
-                                val longitude = viewModel.sharedPreferencesApp.getFloatFromShared(Constants.LONGITUDE, 0f)
-                                val latitude = viewModel.sharedPreferencesApp.getFloatFromShared(Constants.LATITUDE, 0f)
+                                val longitude = viewModel.sharedPreferencesApp.getFloatFromShared(
+                                    Constants.LONGITUDE,
+                                    0f
+                                )
+                                val latitude = viewModel.sharedPreferencesApp.getFloatFromShared(
+                                    Constants.LATITUDE,
+                                    0f
+                                )
                                 progressVisibilityStateLiveData.postValue(true)
-                                viewModel.getPrayerApi(latitude, longitude , 1 ,  1)
+                                viewModel.getPrayerApi(latitude, longitude, 1, 1)
                                 viewModel.currentItem++
                             }
                         }
                     }
-                }else{
+                } else {
                     Log.d("test", "arrow is not clickable")
 
                 }
-            }else{
+            } else {
                 viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
             }
         }
     }
+
     private fun formatTime(timeString: String): String {
         val inputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
         val outputFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
-        val time = inputFormat.parse(DateModifier(). getFirstFiveChars(timeString))
+        val time = inputFormat.parse(DateModifier().getChars(timeString))
         return outputFormat.format(time)
     }
 
     private fun backArrowBtnOnClick() {
         binding.prayerFragBackArrowDate.setOnClickListener {
 
-                if (viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
-                ) {
-                    if(viewModel.isArraysClickable) {
-                        if (viewModel.currentItem <= 0) {
-                            BuildToast.showToast(
-                                requireActivity(),
-                                "Connect get less than today",
-                                FancyToast.WARNING
-                            )
-                            Log.d("test", "Connect get more than 7 days")
-                        } else {
-                            viewModel.currentItem--
-                            val newDate =
-                                (viewModel.currentItem *Constants.DAY_VALUE_IN_MILLI) + Date().time
-                            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                                val itemPrayer = viewModel.selectItemTimeNotLiveData(newDate)
-                                if (itemPrayer != null) {
-                                    withContext(Dispatchers.Main){
-                                        setPrayerTimes(itemPrayer)
-                                    }
+            if (viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
+            ) {
+                if (viewModel.isArraysClickable) {
+                    if (viewModel.currentItem <= 0) {
+                        BuildToast.showToast(
+                            requireActivity(),
+                            "Connect get less than today",
+                            FancyToast.WARNING
+                        )
+                        Log.d("test", "Connect get more than 7 days")
+                    } else {
+                        viewModel.currentItem--
+                        val newDate =
+                            (viewModel.currentItem * Constants.DAY_VALUE_IN_MILLI) + Date().time
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
+                            val itemPrayer = viewModel.selectItemTimeNotLiveData(newDate)
+                            if (itemPrayer != null) {
+                                withContext(Dispatchers.Main) {
+                                    setPrayerTimes(itemPrayer)
                                 }
                             }
                         }
-                    }else{
-                        Log.d("test", "arrow is not clickable")
-
                     }
-                }else{
-                    viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
+                } else {
+                    Log.d("test", "arrow is not clickable")
+
                 }
+            } else {
+                viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
+            }
 
         }
     }
@@ -210,6 +248,68 @@ private fun setPrayerTimes(times: PrayerTimesRoom){
         LocationPermission.locationAddressLiveData.observe(viewLifecycleOwner) {
             binding.prayerFragLocationTxt.text = it
         }
+
+    }
+
+
+    private fun timerForSecondPrayer() {
+        remainingTime.observe(requireActivity()) {
+            if (it.values.first() != 1L) {
+                if (timer != null) {
+                    timer!!.cancel()
+                    timer = null
+                    binding.prayerFragTimerTxt.text = "time left \n 00 hr 00 min"
+                    binding.prayerFragNextPrayerName.text = "Not Found"
+                }
+
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+
+                    timer = object : CountDownTimer(it.values.first(), 60000) {
+                        override fun onTick(p0: Long) {
+                            updateTimer(p0, it.keys.first())
+                        }
+
+                        override fun onFinish() {
+//                            viewModel.handleTimer(mapOfPrayers, viewLifecycleOwner)
+                        }
+                    }.start()
+                }
+            }
+
+        }
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    private fun updateTimer(remainingTime: Long, prayerName: String) {
+
+        val dateDifference = remainingTime / 1000
+        var hour = (dateDifference / 3600)
+        var minute = (dateDifference / 60) % 60
+        var result = java.lang.StringBuilder()
+        result.append("time left")
+        result.append(String.format("%02d", hour))
+        result.append("hour")
+        result.append(String.format("%02d", minute))
+        result.append("minute")
+        viewModel.viewModelScope.launch(Dispatchers.Main) {
+            binding.prayerFragTimerTxt.text = result
+            binding.prayerFragNextPrayerName.text = prayerName
+        }
+
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        timerForSecondPrayer()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        timer?.cancel()
+        timer = null
 
     }
 

@@ -68,7 +68,7 @@
         android:id="@+id/prayerFrag_line_under_locationTxt"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/navy_blue"
+        android:background="@color/Line"
         android:layout_marginTop="@dimen/_16sdp"
         app:layout_constraintTop_toBottomOf="@+id/prayerFrag_location_txt" />
 
@@ -80,7 +80,7 @@
         android:layout_marginEnd="@dimen/_24sdp"
         android:text="@string/prayerFreg_demo_time_left_n_1_hr_16_min"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="@dimen/_18sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/prayerFrag_line_under_locationTxt" />
@@ -91,7 +91,7 @@
         android:layout_marginStart="@dimen/_24sdp"
         android:layout_marginTop="@dimen/_24sdp"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="@dimen/_18sdp"
         android:text="@string/prayerFreg_demo_next_prayer"
         app:layout_constraintTop_toBottomOf="@+id/prayerFrag_line_under_locationTxt"
@@ -105,7 +105,7 @@
         android:layout_marginTop="@dimen/_24sdp"
         android:text="@string/prayerFrag_demo_isha"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="@dimen/_20sdp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/prayerFrag_nextPrayer_Txt"
@@ -216,7 +216,7 @@
         android:id="@+id/prayerFrag_line_under_prayers"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/navy_blue"
+        android:background="@color/Line"
         android:layout_marginTop="@dimen/_17sdp"
         app:layout_constraintTop_toBottomOf="@+id/prayerFrag_ishaTime" />
 

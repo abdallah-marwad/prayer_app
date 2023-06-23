@@ -2,10 +2,9 @@ package com.abdallah.prayerapp.data.source.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
+import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 
 @Dao
 interface PrayerDao {

@@ -3,13 +3,11 @@ package com.abdallah.prayerapp.data.repository
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.abdallah.prayerapp.data.model.PrayerNetworkModel
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
+import com.abdallah.prayerapp.data.model.prayer.PrayerNetworkModel
+import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 import com.abdallah.prayerapp.data.source.local.RoomDB
-import com.abdallah.prayerapp.data.source.networking.PrayerRetrofit
-import com.abdallah.prayerapp.utils.common.MyApplication
+import com.abdallah.prayerapp.data.source.networking.RetrofitInstance
 import retrofit2.Call
-import retrofit2.http.Query
 
 class PrayerFragmentRepository(val app: Application) {
     private val roomInstance by lazy { RoomDB.getInstance(app) }
@@ -21,7 +19,7 @@ class PrayerFragmentRepository(val app: Application) {
         month: Int,
         year: Int
     ): Call<PrayerNetworkModel?>? =
-        PrayerRetrofit.getInstance().getPrayerTimes(month,year,latitude!!.toDouble(),longitude!!.toDouble())
+        RetrofitInstance.getInstance().getPrayerTimes(month,year,latitude!!.toDouble(),longitude!!.toDouble())
 
 
     // Room

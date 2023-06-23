@@ -4,10 +4,10 @@ import android.app.Activity
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.abdallah.prayerapp.data.model.PrayerNetworkModel
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
+import com.abdallah.prayerapp.data.model.prayer.PrayerNetworkModel
+import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 import com.abdallah.prayerapp.data.repository.PrayerFragmentRepository
-import com.abdallah.prayerapp.model.ApiObjConverter
+import com.abdallah.prayerapp.data.model.prayer.ApiObjConverter
 import com.abdallah.prayerapp.ui.fragment.PrayersFragment.Companion.progressVisibilityStateLiveData
 import com.abdallah.prayerapp.utils.CalenderCustomTime
 import com.abdallah.prayerapp.utils.CheckInternetConnectivity
@@ -34,9 +34,11 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     var prayerTimesLiveData: MutableLiveData<PrayerTimesRoom> = MutableLiveData()
     private val longAndLatStateFlow: MutableStateFlow<Boolean> =
         MutableStateFlow(false)
-    private val getItemFromRoomStateFlow: MutableStateFlow<Boolean> =
-        MutableStateFlow(false)
 
+
+//    fun handleTimer(map : MutableMap<String,String> , lifecycleOwner: LifecycleOwner){
+//        Timer(map).checkTheRangeOfPrayerTimes(lifecycleOwner)
+//    }
     fun getLocationCall(activity: Activity, owner: LifecycleOwner) {
         if (!sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)) {
             Log.d("Test", "Room dont have data will make api call")

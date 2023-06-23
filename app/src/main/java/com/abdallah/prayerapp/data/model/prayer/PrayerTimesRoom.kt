@@ -1,4 +1,4 @@
-package com.abdallah.prayerapp.data.model
+package com.abdallah.prayerapp.data.model.prayer
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

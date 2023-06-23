@@ -7,11 +7,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-class PrayerRetrofit {
+class RetrofitInstance {
 
     companion object {
         private  var retrofit: Retrofit? = null
-        private  var prayerApi: PrayerApi? = null
+        private  var apiServices: ApiServices? = null
         private fun client(): OkHttpClient {
             return OkHttpClient().newBuilder().callTimeout(25, TimeUnit.SECONDS)
                 .connectTimeout(12, TimeUnit.SECONDS)
@@ -30,11 +30,11 @@ class PrayerRetrofit {
             return retrofit!!
         }
 
-        fun getInstance(): PrayerApi {
-            if (prayerApi == null){
-                prayerApi =getConnection().create(PrayerApi::class.java)
+        fun getInstance(): ApiServices {
+            if (apiServices == null){
+                apiServices =getConnection().create(ApiServices::class.java)
             }
-            return prayerApi!!
+            return apiServices!!
         }
 
     }

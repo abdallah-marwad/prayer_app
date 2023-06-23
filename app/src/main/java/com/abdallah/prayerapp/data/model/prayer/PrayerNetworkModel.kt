@@ -1,4 +1,4 @@
-package com.abdallah.prayerapp.data.model
+package com.abdallah.prayerapp.data.model.prayer
 
 data class PrayerNetworkModel(
     val code: Int,

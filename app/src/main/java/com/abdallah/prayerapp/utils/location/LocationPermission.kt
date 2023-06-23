@@ -29,11 +29,10 @@ class LocationPermission {
     companion object {
         val locationLiveData: MutableLiveData<Map<String, Float>> = MutableLiveData()
         val locationAddressLiveData: MutableLiveData<String> = MutableLiveData()
-        val progressbarStateLiveData: MutableLiveData<Boolean> = MutableLiveData()
     }
 
 
-    fun takeLocationPermission(activity: Activity) {
+    fun takeLocationPermission(activity: Activity,detectLocation : Boolean = true) {
         if (ActivityCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -69,7 +68,7 @@ class LocationPermission {
             }
 
         } else {
-            detectLocation(activity)
+            detectLocation(activity , detectLocation)
         }
 
     }
@@ -87,7 +86,7 @@ class LocationPermission {
 
 
     @SuppressLint("MissingPermission")
-    fun detectLocation(context: Activity) {
+    fun detectLocation(context: Activity ,detectLocation : Boolean = true) {
         val sharedInstance = SharedPreferencesApp.getInstance(context.application)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
         fusedLocationProviderClient.lastLocation.addOnFailureListener {
@@ -97,7 +96,7 @@ class LocationPermission {
                 if (location == null) {
                     BuildToast.showToast(
                         context,
-                        "Please open location .",
+                        "cannot access location , please waite... ",
                         FancyToast.ERROR
                     )
                     getCurrentLocationIfLastLocationIsNull(context,sharedInstance)
@@ -110,7 +109,7 @@ class LocationPermission {
     }
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocationIfLastLocationIsNull(context: Activity , sharedInstance: SharedPreferencesApp){
+    private fun getCurrentLocationIfLastLocationIsNull(context: Activity , sharedInstance: SharedPreferencesApp,detectLocation : Boolean = true){
         fusedLocationProviderClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
@@ -131,29 +130,30 @@ class LocationPermission {
                 if (location == null) {
                     BuildToast.showToast(
                         context,
-                        "cannot access location !",
+                        "Please open location service !",
                         FancyToast.ERROR
                     )
 
                     Log.d("test", "Location is null LocationPermission.Class")
 
                 } else {
-                    locationIsNotNull(location , sharedInstance , context)
+                    locationIsNotNull(location , sharedInstance , context,detectLocation)
                 }
             }
     }
 
-private fun locationIsNotNull(location: Location , sharedInstance: SharedPreferencesApp , context: Activity){
+private fun locationIsNotNull(location: Location , sharedInstance: SharedPreferencesApp , context: Activity,detectLocation : Boolean = true){
     val longitude = location.longitude.toFloat()
     val latitude = location.longitude.toFloat()
     var locationCityDetector = LocationCityDetector()
     coroutineScope.launch {
         sharedInstance.writeInShared(Constants.LONGITUDE, longitude)
         sharedInstance.writeInShared(Constants.LATITUDE, latitude)
-        locationCityDetector.setAddress(
+        if(detectLocation){locationCityDetector.setAddress(
             latitude.toDouble(), longitude.toDouble(),coroutineScope,
             sharedInstance, context
-        )
+        )}
+
         locationLiveData.postValue(
             mapOf(
                 Constants.LONGITUDE to longitude,

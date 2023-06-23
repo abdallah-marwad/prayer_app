@@ -7,7 +7,7 @@ import androidx.room.InvalidationTracker
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
+import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 
 
 @Database(entities = [PrayerTimesRoom::class ], version = 2)

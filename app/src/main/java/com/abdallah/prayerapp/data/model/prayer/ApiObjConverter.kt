@@ -1,9 +1,6 @@
-package com.abdallah.prayerapp.model
+package com.abdallah.prayerapp.data.model.prayer
 
-import com.abdallah.prayerapp.data.model.Data
-import com.abdallah.prayerapp.data.model.PrayerTimesRoom
 import com.abdallah.prayerapp.utils.CalenderCustomTime
-import java.util.*
 
 class ApiObjConverter {
 
