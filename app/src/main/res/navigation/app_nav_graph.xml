@@ -9,14 +9,28 @@
         android:id="@+id/prayersFragment"
         android:name="com.abdallah.prayerapp.ui.fragment.PrayersFragment"
         android:label="fragment_prayers"
-        tools:layout="@layout/fragment_prayers" >
+        tools:layout="@layout/fragment_prayers"
+        >
         <action
             android:id="@+id/action_prayersFragment_to_quiblaFragment"
-            app:destination="@id/quiblaFragment" />
+            app:destination="@id/quiblaFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"
+            />
     </fragment>
     <fragment
         android:id="@+id/quiblaFragment"
         android:name="com.abdallah.prayerapp.ui.fragment.QuiblaFragment"
         android:label="fragment_quibla"
-        tools:layout="@layout/fragment_quibla" />
+
+        tools:layout="@layout/fragment_quibla"
+
+        >
+        <action
+            android:id="@+id/action_quiblaFragment_to_prayersFragment"
+            app:destination="@id/prayersFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"
+            />
+    </fragment>
 </navigation>

@@ -44,11 +44,15 @@ class QiblaViewModel(application: Application) : AndroidViewModel(application) {
         latitude: Float,
         longitude: Float,
     ) {
-        RetrofitInstance.getInstance().getQiblaDirection(latitude.toDouble(),longitude.toDouble())!!.enqueue(
+        RetrofitInstance.getInstance(Constants.BASE_URL_Qibla).getQiblaDirection(latitude.toDouble(),longitude.toDouble())!!.enqueue(
             object : Callback<QuiblaModel?>{
                 override fun onResponse(call: Call<QuiblaModel?>, response: Response<QuiblaModel?>) {
                     if (response.isSuccessful) {
                         quiblaDirectionLiveData.postValue(response.body())
+                        Log.d("test" , "lat forom pai : ${response.body()!!.data.latitude}")
+                    }
+                    else{
+                        Log.d("test" , "code of response in qibla : ${response.code()}")
                     }
                 }
 
@@ -58,6 +62,8 @@ class QiblaViewModel(application: Application) : AndroidViewModel(application) {
                         t.message!!,
                         FancyToast.WARNING
                     )
+                    Log.d("test" , "${t.message}")
+
                 }
 
             }

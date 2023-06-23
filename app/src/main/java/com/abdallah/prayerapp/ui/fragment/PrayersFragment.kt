@@ -1,14 +1,17 @@
 package com.abdallah.prayerapp.ui.fragment
 
+import android.R
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -90,7 +93,7 @@ class PrayersFragment : Fragment() {
                 setPrayerTimes(times)
                 setPrayerMap(times)
                 if (times.StringDate!! == CalenderCustomTime().getCalenderWithCustomTime(Date().time)) {
-//                    viewModel.handleTimer(mapOfPrayers, viewLifecycleOwner)
+                    getTimer()
                 }
             } else {
                 Log.d("test", "get data times is null from room")
@@ -98,6 +101,10 @@ class PrayersFragment : Fragment() {
 
 
         }
+    }
+    private fun getTimer(){
+        viewModel.handleTimer(mapOfPrayers)
+        viewModel.checkTimer (viewLifecycleOwner)
     }
 
     private fun setPrayerMap(times: PrayerTimesRoom) {
@@ -122,8 +129,9 @@ class PrayersFragment : Fragment() {
 
     private fun forwardArrowBtnOnClick() {
         binding.prayerFragForwardArrowDate.setOnClickListener {
-            if (viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
-            ) {
+            checkRoomData()
+            roomHaveData = {
+                if (it) {
                 if (viewModel.isArraysClickable) {
                     if (viewModel.currentItem >= 7) {
                         BuildToast.showToast(
@@ -169,6 +177,7 @@ class PrayersFragment : Fragment() {
             } else {
                 viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
             }
+            }
         }
     }
 
@@ -178,12 +187,20 @@ class PrayersFragment : Fragment() {
         val time = inputFormat.parse(DateModifier().getChars(timeString))
         return outputFormat.format(time)
     }
-
+    var roomHaveData : ((Boolean)->Unit )? = null
+    private fun checkRoomData(){
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
+            withContext(Dispatchers.Main){
+                roomHaveData?.let { it(true) }
+            }
+        }
+    }
     private fun backArrowBtnOnClick() {
         binding.prayerFragBackArrowDate.setOnClickListener {
-
-            if (viewModel.sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)
-            ) {
+            checkRoomData()
+            roomHaveData = {
+            if (it) {
                 if (viewModel.isArraysClickable) {
                     if (viewModel.currentItem <= 0) {
                         BuildToast.showToast(
@@ -210,9 +227,12 @@ class PrayersFragment : Fragment() {
 
                 }
             } else {
-                viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
+                viewModel.viewModelScope.launch(Dispatchers.Main) {
+                    viewModel.getLocationCall(requireActivity(), viewLifecycleOwner)
+                }
             }
 
+        }
         }
     }
 
@@ -261,56 +281,45 @@ class PrayersFragment : Fragment() {
                     binding.prayerFragTimerTxt.text = "time left \n 00 hr 00 min"
                     binding.prayerFragNextPrayerName.text = "Not Found"
                 }
-
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-
                     timer = object : CountDownTimer(it.values.first(), 60000) {
                         override fun onTick(p0: Long) {
                             updateTimer(p0, it.keys.first())
                         }
 
                         override fun onFinish() {
-//                            viewModel.handleTimer(mapOfPrayers, viewLifecycleOwner)
+                            getTimer()
+                            timerForSecondPrayer()
+
                         }
                     }.start()
                 }
-            }
 
         }
     }
 
     @SuppressLint("SuspiciousIndentation")
     private fun updateTimer(remainingTime: Long, prayerName: String) {
-
-        val dateDifference = remainingTime / 1000
-        var hour = (dateDifference / 3600)
-        var minute = (dateDifference / 60) % 60
-        var result = java.lang.StringBuilder()
-        result.append("time left")
-        result.append(String.format("%02d", hour))
-        result.append("hour")
-        result.append(String.format("%02d", minute))
-        result.append("minute")
-        viewModel.viewModelScope.launch(Dispatchers.Main) {
-            binding.prayerFragTimerTxt.text = result
-            binding.prayerFragNextPrayerName.text = prayerName
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            val dateDifference = remainingTime / 1000
+            var hour = (dateDifference / 3600)
+            var minute = (dateDifference / 60) % 60
+            var result = java.lang.StringBuilder()
+            result.append("time left \n")
+            result.append(String.format("%02d", hour))
+            result.append("hr")
+            result.append(String.format("%02d", minute))
+            result.append("min")
+            withContext(Dispatchers.Main) {
+                binding.prayerFragTimerTxt.text = result
+                binding.prayerFragNextPrayerName.text = prayerName
+            }
         }
-
     }
-
 
     override fun onResume() {
         super.onResume()
         timerForSecondPrayer()
-
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        timer?.cancel()
-        timer = null
-
-    }
 
 }

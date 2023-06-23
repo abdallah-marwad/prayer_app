@@ -3,6 +3,7 @@ package com.abdallah.prayerapp.utils
 class Constants {
     companion object {
         const val BASE_URL = "https://api.aladhan.com/v1/calendar/"
+        const val BASE_URL_Qibla = "https://api.aladhan.com/v1/qibla/"
         const val LOCATION_REQUEST_CODE = 1
         const val LONGITUDE = "longitude"
         const val LATITUDE = "latitude"

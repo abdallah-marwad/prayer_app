@@ -13,6 +13,8 @@
     <color name="text_color">@color/black</color>
     <color name="arrow_color">@color/black</color>
     <color name="Line">@color/navy_blue</color>
+    <color name="status_bg">#005C2F</color>
+    <color name="appbar_bg">#1F9E43</color>
 
 
 </resources>

@@ -3,6 +3,7 @@ package com.abdallah.prayerapp.ui.viewmodel.prayer
 import android.app.Activity
 import android.app.Application
 import android.util.Log
+import androidx.constraintlayout.motion.widget.Debug.getLocation
 import androidx.lifecycle.*
 import com.abdallah.prayerapp.data.model.prayer.PrayerNetworkModel
 import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
@@ -31,14 +32,21 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     var isArraysClickable = false
     var longitude: Float? = null
     var latitude: Float? = null
+    val timer   by lazy {   Timer() }
     var prayerTimesLiveData: MutableLiveData<PrayerTimesRoom> = MutableLiveData()
     private val longAndLatStateFlow: MutableStateFlow<Boolean> =
         MutableStateFlow(false)
 
 
-//    fun handleTimer(map : MutableMap<String,String> , lifecycleOwner: LifecycleOwner){
-//        Timer(map).checkTheRangeOfPrayerTimes(lifecycleOwner)
-//    }
+    fun handleTimer(map : MutableMap<String,String> ){
+        viewModelScope.launch {
+            timer.handleTodayPrayerLongTime(map)
+        }
+
+    }
+    fun checkTimer(lifecycleOwner: LifecycleOwner){
+        timer.checkTheRangeOfPrayerTimes(lifecycleOwner)
+    }
     fun getLocationCall(activity: Activity, owner: LifecycleOwner) {
         if (!sharedPreferencesApp.preferences.contains(Constants.ROOM_CONTAIN_DATA)) {
             Log.d("Test", "Room dont have data will make api call")
@@ -51,7 +59,6 @@ class PrayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
                     FancyToast.WARNING
                 )
             }
-
         } else {
             // get data from database but if not found the date make new api call
             Log.d("Test", "Room alredy have data and show from it")

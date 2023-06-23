@@ -7,14 +7,17 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.abdallah.prayerapp.databinding.ActivityMainBinding
 import com.abdallah.prayerapp.utils.Constants
+import com.abdallah.prayerapp.utils.LangApp
 import com.abdallah.prayerapp.utils.location.LocationPermission
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LangApp().checkLang(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 //        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         Log.d("test" , "main activity created")
 

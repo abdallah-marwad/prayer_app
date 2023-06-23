@@ -18,11 +18,11 @@ class RetrofitInstance {
                 .readTimeout(12, TimeUnit.SECONDS).retryOnConnectionFailure(false)
                 .build()
         }
-        private fun getConnection(): Retrofit {
+        private fun getConnection(baseUrl : String): Retrofit {
 
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(baseUrl)
                     .client(client())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
@@ -30,9 +30,9 @@ class RetrofitInstance {
             return retrofit!!
         }
 
-        fun getInstance(): ApiServices {
+        fun getInstance(baseUrl : String): ApiServices {
             if (apiServices == null){
-                apiServices =getConnection().create(ApiServices::class.java)
+                apiServices =getConnection(baseUrl).create(ApiServices::class.java)
             }
             return apiServices!!
         }

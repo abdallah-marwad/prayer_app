@@ -144,7 +144,7 @@ class LocationPermission {
 
 private fun locationIsNotNull(location: Location , sharedInstance: SharedPreferencesApp , context: Activity,detectLocation : Boolean = true){
     val longitude = location.longitude.toFloat()
-    val latitude = location.longitude.toFloat()
+    val latitude = location.latitude.toFloat()
     var locationCityDetector = LocationCityDetector()
     coroutineScope.launch {
         sharedInstance.writeInShared(Constants.LONGITUDE, longitude)

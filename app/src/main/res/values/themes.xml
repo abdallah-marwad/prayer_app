@@ -4,8 +4,8 @@
         <item name="android:windowActionBar">false</item>
         <item name="windowActionBar">false</item>
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/navy_blue</item>
-        <item name="colorPrimaryVariant">@color/navy_blue_dark</item>
+        <item name="colorPrimary">@color/appbar_bg</item>
+        <item name="colorPrimaryVariant">@color/status_bg</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -28,9 +28,14 @@
     <style name="prayerFrag_prayers_txt_style">
         <item name="android:textSize">@dimen/_18ssp</item>
         <item name="android:textColor">@color/text_color</item>
-        <item name="android:layout_marginHorizontal">@dimen/_20sdp</item>
         <item name="android:layout_height">0dp</item>
-        <item name="layout_constraintHeight_percent">0.07</item>
+        <item name="layout_constraintHeight_percent">0.166</item>
+    </style>
+    <style name="seprate_line_style">
+        <item name="android:textSize">@dimen/_18ssp</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="layout_constraintHeight_percent">0.166</item>
     </style>
 
 </resources>

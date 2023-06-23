@@ -11,39 +11,36 @@ import com.abdallah.prayerapp.utils.Constants
 import com.abdallah.prayerapp.utils.DateModifier
 import java.util.*
 
-class Timer(mapOfStrings : MutableMap<String,String> ){
+class Timer {
     private var dateModifier = DateModifier()
     private val calenderCustomTime = CalenderCustomTime()
     private var mapOfPrayersLongTimes: MutableMap<String, Long> = mutableMapOf()
     private var prayersInLongCallBack: MutableLiveData<Map<String, Long>> = MutableLiveData()
-    init {
-        handleTodayPrayerLongTime(mapOfStrings )
+
+
+    private fun todayPrayerLongTime(mapOfStrings: MutableMap<String, String>, prayerName: String) {
+        val hours = dateModifier.getChars(mapOfStrings[prayerName]!!, 0, 1).toInt()
+        val minutes = dateModifier.getChars(mapOfStrings[prayerName]!!, 3, 4).toInt()
+        mapOfPrayersLongTimes[prayerName] =
+            calenderCustomTime.getCalenderWithCustomLongTime(hours, minutes)
+        Log.d("test", "$prayerName at $hours:$minutes")
     }
 
-
-
-    private fun todayPrayerLongTime(mapOfStrings : MutableMap<String,String>, prayerName : String){
-        val hours =dateModifier.getChars(mapOfStrings[prayerName]!! , 0,1).toInt()
-        val minutes=dateModifier.getChars(mapOfStrings[prayerName]!! , 3,4).toInt()
-        mapOfPrayersLongTimes[prayerName] = calenderCustomTime.getCalenderWithCustomLongTime( hours,minutes)
-        Log.d("test" , "$prayerName at $hours:$minutes")
-    }
-
-    private fun handleTodayPrayerLongTime(mapOfStrings : MutableMap<String,String> ){
-        todayPrayerLongTime(mapOfStrings,Constants.FAJR)
-        todayPrayerLongTime(mapOfStrings,Constants.SUNRISE)
-        todayPrayerLongTime(mapOfStrings,Constants.DUHR)
-        todayPrayerLongTime(mapOfStrings,Constants.ASR)
-        todayPrayerLongTime(mapOfStrings,Constants.MAGHREB)
-        todayPrayerLongTime(mapOfStrings,Constants.ISHA)
+    fun handleTodayPrayerLongTime(mapOfStrings: MutableMap<String, String>) {
+        todayPrayerLongTime(mapOfStrings, Constants.FAJR)
+        todayPrayerLongTime(mapOfStrings, Constants.SUNRISE)
+        todayPrayerLongTime(mapOfStrings, Constants.DUHR)
+        todayPrayerLongTime(mapOfStrings, Constants.ASR)
+        todayPrayerLongTime(mapOfStrings, Constants.MAGHREB)
+        todayPrayerLongTime(mapOfStrings, Constants.ISHA)
         prayersInLongCallBack.postValue(mapOfPrayersLongTimes)
     }
 
     fun checkTheRangeOfPrayerTimes(lifecycleOwner: LifecycleOwner) {
-        prayersInLongCallBack.observe(lifecycleOwner){prayerTimes->
+        prayersInLongCallBack.observe(lifecycleOwner) { prayerTimes ->
             val date = Date().time
             var dateDifference = -1L
-            var PrayerName = ""
+            var PrayerName = "Next \n Prayer"
             if (prayerTimes[Constants.FAJR]!! < date && date < prayerTimes[Constants.SUNRISE]!!) {
                 Log.d("test", "in 1 Range")
                 dateDifference = prayerTimes[Constants.SUNRISE]!! - date
@@ -60,23 +57,23 @@ class Timer(mapOfStrings : MutableMap<String,String> ){
                 Log.d("test", "in 4 Range")
                 dateDifference = prayerTimes[Constants.MAGHREB]!! - date
                 PrayerName = "Magreb"
-            } else if (prayerTimes[Constants.MAGHREB]!! < date && date < prayerTimes[Constants.ISHA]!! ) {
+            } else if (prayerTimes[Constants.MAGHREB]!! < date && date < prayerTimes[Constants.ISHA]!!) {
                 Log.d("test", "in 5 Range")
                 dateDifference = prayerTimes[Constants.ISHA]!! - date
                 PrayerName = "Isha"
             }
             // before 12 AM
-            else if ((prayerTimes[Constants.ISHA]!!) < date && date < prayerTimes[Constants.FAJR]!!+86400000) {
+            else if ((prayerTimes[Constants.ISHA]!!) < date && date < prayerTimes[Constants.FAJR]!! + Constants.DAY_VALUE_IN_MILLI) {
                 Log.d("test", "in 6 Range")
-                dateDifference = date -(prayerTimes[Constants.FAJR]!!+86400000)
+                dateDifference = date - (prayerTimes[Constants.FAJR]!! + Constants.DAY_VALUE_IN_MILLI)
                 PrayerName = "Fajr"
             }
             //after 12 AM
-            else if ((prayerTimes[Constants.ISHA]!!-86400000) < date && date < prayerTimes[Constants.FAJR]!!) {
+            else if ((prayerTimes[Constants.ISHA]!! - Constants.DAY_VALUE_IN_MILLI) < date && date < prayerTimes[Constants.FAJR]!!) {
                 Log.d("test", "in 6 Range")
-                dateDifference = date -prayerTimes[Constants.FAJR]!!
+                dateDifference = date - prayerTimes[Constants.FAJR]!!
                 PrayerName = "Fajr"
-            }else{
+            } else {
                 Log.d("test", "didnt found range")
 
             }
@@ -86,9 +83,9 @@ class Timer(mapOfStrings : MutableMap<String,String> ){
             }
 
 
-            PrayersFragment.remainingTime.value = mapOf(PrayerName to dateDifference)
+            remainingTime.value = mapOf(PrayerName to dateDifference)
 
         }
     }
 
-        }
+}

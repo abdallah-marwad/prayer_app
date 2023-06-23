@@ -7,6 +7,7 @@ import com.abdallah.prayerapp.data.model.prayer.PrayerNetworkModel
 import com.abdallah.prayerapp.data.model.prayer.PrayerTimesRoom
 import com.abdallah.prayerapp.data.source.local.RoomDB
 import com.abdallah.prayerapp.data.source.networking.RetrofitInstance
+import com.abdallah.prayerapp.utils.Constants
 import retrofit2.Call
 
 class PrayerFragmentRepository(val app: Application) {
@@ -19,7 +20,7 @@ class PrayerFragmentRepository(val app: Application) {
         month: Int,
         year: Int
     ): Call<PrayerNetworkModel?>? =
-        RetrofitInstance.getInstance().getPrayerTimes(month,year,latitude!!.toDouble(),longitude!!.toDouble())
+        RetrofitInstance.getInstance(Constants.BASE_URL).getPrayerTimes(month,year,latitude!!.toDouble(),longitude!!.toDouble())
 
 
     // Room
