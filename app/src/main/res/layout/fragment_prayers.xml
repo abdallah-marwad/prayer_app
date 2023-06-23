@@ -37,12 +37,12 @@
                 style="@style/prayerFrag_dateAndLocation_txt_style"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_12sdp"
 
                 android:text="@string/demo_date_txt_prayert"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.12"
+                app:layout_constraintHeight_percent="0.14"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/prayerFrag_childConstraint" />
 
@@ -51,7 +51,7 @@
                 style="@style/prayerFrag_dateAndLocation_txt_style"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:maxLines="2"
                 android:text="@string/demo_location_txt_prayert"
                 android:textColor="@color/white"
@@ -68,8 +68,8 @@
                 android:padding="@dimen/_4sdp"
 
                 android:src="@drawable/arrow_back_black"
-                app:layout_constraintEnd_toStartOf="@+id/prayerFrag_location_txt"
-                app:layout_constraintHeight_percent="0.3"
+                app:layout_constraintEnd_toStartOf="@+id/prayerFrag_date_txt"
+                app:layout_constraintHeight_percent="0.26"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1" />
@@ -83,7 +83,7 @@
                 android:src="@drawable/arrow_forward_black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.3"
-                app:layout_constraintStart_toEndOf="@+id/prayerFrag_location_txt"
+                app:layout_constraintStart_toEndOf="@+id/prayerFrag_date_txt"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1" />
 
@@ -137,22 +137,19 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/_14sdp"
-            app:cardCornerRadius="@dimen/_10sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/prayerFrag_childConstraint">
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/prayerrFrag_childConstraint_prayer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#BEDCBF"
+                android:layout_height="0dp"
+                android:layout_margin="@dimen/_14sdp"
+                app:cardCornerRadius="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/prayerFrag_childConstraint"
+                android:background="@drawable/btn_bg"
 
                 android:padding="@dimen/_14sdp">
 
@@ -167,11 +164,9 @@
                 <View
                     android:id="@+id/view"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@color/status_bg"
-                    app:layout_constraintHeight_percent="0"
+                    style="@style/seprate_line_style"
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_fajrTxt"
-                    tools:layout_editor_absoluteX="15dp" />
+                     />
 
                 <TextView
                     android:id="@+id/prayerFrag_sunriseTxt"
@@ -183,9 +178,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@color/status_bg"
-                    app:layout_constraintHeight_percent="0"
+                    style="@style/seprate_line_style"
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_sunriseTxt"
                     tools:layout_editor_absoluteX="14dp" />
 
@@ -199,9 +192,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@color/status_bg"
-                    app:layout_constraintHeight_percent="0"
+                    style="@style/seprate_line_style"
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_duhrTxt" />
 
                 <TextView
@@ -214,9 +205,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@color/status_bg"
-                    app:layout_constraintHeight_percent="0"
+                    style="@style/seprate_line_style"
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_asrTxt" />
 
                 <TextView
@@ -229,9 +218,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@color/status_bg"
-                    app:layout_constraintHeight_percent="0"
+                    style="@style/seprate_line_style"
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_maghrebTxt" />
 
                 <TextView
@@ -291,21 +278,21 @@
                     app:layout_constraintTop_toBottomOf="@+id/prayerFrag_maghrebTxt" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.cardview.widget.CardView>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/prayerFrag_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/appbar_bg"
+            android:background="@drawable/btn_bg"
+            android:paddingHorizontal="@dimen/_7sdp"
             android:text="@string/show_qbla_direction_on_map"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="@dimen/_13ssp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView" />
+            app:layout_constraintTop_toBottomOf="@+id/prayerrFrag_childConstraint_prayer" />
 
         <ProgressBar
             android:id="@+id/progress"

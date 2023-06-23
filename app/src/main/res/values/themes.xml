@@ -32,10 +32,8 @@
         <item name="layout_constraintHeight_percent">0.166</item>
     </style>
     <style name="seprate_line_style">
-        <item name="android:textSize">@dimen/_18ssp</item>
-        <item name="android:textColor">@color/text_color</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="layout_constraintHeight_percent">0.166</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/status_bg</item>
     </style>
 
 </resources>

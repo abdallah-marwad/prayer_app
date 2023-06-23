@@ -96,7 +96,7 @@ class LocationPermission {
                 if (location == null) {
                     BuildToast.showToast(
                         context,
-                        "cannot access location , please waite... ",
+                        "cannot access location , please wait... ",
                         FancyToast.ERROR
                     )
                     getCurrentLocationIfLastLocationIsNull(context,sharedInstance)
